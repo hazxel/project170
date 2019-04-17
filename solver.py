@@ -1,4 +1,8 @@
-# Put your solution here.
+import networkx as nx
+import random
 
 def solve(client):
-    pass
+    client.end()
+    client.start()
+    print("testing API:")
+    client.end()
