@@ -14,22 +14,32 @@
 \begin{document}
 \maketitle
 
-\section{If there was a Guavabot on every node, what sequence of scouts and remotes would you do to get them all home?}
-Find the MST of the graph, treat home as the root of the tree.
-Then run DFS from home on the MST, and remote every node to its 
-parent in post order of DFS untill all bots are returned home, merging naturally in the process.
-And the cost will be the sum of all edge weights of MST.
+\section{If there was a Guavabot on every node, 
+what sequence of scouts and remotes would you do to get them all home?}
 
+\begin{itemize}
+\item Find the MST of the graph, treat home as the root of the tree.
+\item Then run DFS from home on the MST, and remote every node to its 
+parent in post order of DFS untill all bots are returned home, merging naturally in the process.
+\item And the cost will be the sum of all edge weights of MST.
+\end{itemize}
+
+
+\newpage
 \section{More generally, if you knew where all the bots were, what sequence of scouts and remotes would you do to get them all home?}
-\begin{enumerate}[label=(\alph*)]
-\item No scout is needed. Construct multiple of MST, such that each MST only contains vertices that have bot in it. 
+\begin{itemize}
+\item No scout is needed. 
+\item Construct multiple of MST, such that each MST only contains vertices that have bot in it. 
 \item Run Dijkstra's algorithm starting from home. This computes the shortest path from home to all of MST's. Store all paths and their length in list $D$. Sort list $D$ from shortest to longest.
 \item Remove the shortest path in $D$, which correspond to a closest MST $m$. Draw a radius $f(D, m)$ circle starting from MST (where $f(\cdot, \cdot)$ is a to be determined function. The naive case would be $f(D, m) = D$), 
 and remote each neighbor MST that is inside this circle to $m$, via the shortest path between these two MST's. Also remove each of such neighbors from list $D$. Repeat this process until all $L$ bots are remoted to home.
+\end{itemize}
 
-\end{enumerate}
 
-\section{If you didn't care about getting the bots home and just wanted to find their locations as quickly as possible, what sequence of scouts and remotes would you do?}
+\newpage
+\section{If you didn't care about getting the bots home 
+and just wanted to find their locations as quickly as possible, 
+what sequence of scouts and remotes would you do?}
 \begin{itemize}
 \item Scout all the vertices, using all students. 
 \item Sort all vertices based on students' votes, from high to low. 
@@ -38,6 +48,8 @@ and remote each neighbor MST that is inside this circle to $m$, via the shortest
 \item Specifically, record the start and end vertices of each remote to avoid double counting.
 \end{itemize}
 
+
+\newpage
 \section{What ideas do you have for solvers? Please provide at least 2. What are their advantages/disadvantages?}
 Define $P(i)$ as the proportion of student votes that indicates a bot is present at vertex $i$. 
 \begin{enumerate}[label=(\alph*)]
@@ -70,13 +82,16 @@ Advantages: no potentionally suboptimal remote to determine bot location.\\
 Disadvantages: probability of remoting empty vertex depends on student reliability. Also depending on graph, each remote all the way back home may not carry additional bot back, which may cause suboptimal remotes.
 \end{enumerate}
 
+
+\newpage
 \section{What kinds of inputs do you think your solvers will do well on? Do poorly on?}
 No matter which solver we adopt, if $|S_i| = |V|/2 \; \forall i$, which means each students is as much unreliable as possible, then both our solvers will suffer from weak performance (The only solver that does not suffer from this is blindly sort all edges in graph, and remote lowest weight edges first).
 The rest performance issues are specific to graph.
-\begin{enumerate}[label=(\alph*)]
+\begin{itemize}
     \item \emph{Algorithm 1}\\
     It will do well in case where bot containing vertices are neighbor to each other, so that they can form a single MST. It will do poorly when each bot containing vertex is far away from other bot containing vertices. 
     \item \emph{Algorithm 2}\\
     It will do well in case where all other bots locate along the shortest path between one bot and the home, and that one bot gets remoted first. It will do poorly is we have the same graph setup but instead remote vertices that are closest to home to vertices that are farthest to home.
-\end{enumerate}
+\end{itemize}
+
 \end{document}
