@@ -16,6 +16,36 @@ To test locally, please do the following:
 def solve(client):
     client.end()
     client.start()
-    print("testing API:")
+    print("The Rescue begins:")
+    print("    Home vertex: ", client.h)
+    print("    Number of students: ", client.k)
+    print("    Number of bots: ", client.l)
+    print("    Number of vertices: ", client.v)
+    print("    Number of edges: ", client.e)
+
+    '''
+    print("All the edges are:")
+    for (u, v, wt) in client.G.edges.data('weight'):
+        print('(%d, %d, %.3f)' % (u, v, wt))
+    '''
+
+    print("\n    Students' estimation of bot's existance of every vertex:\n    ", 
+        votes(client))
+
     client.end()
 
+
+### Returns a list which shows the number of students who believe there exists a bot on a certain vertex.
+### Note that this function runs client.scout k*v times!!!
+def votes(client):
+    p = []
+    vertices = list(range(1, client.home)) + list(range(client.home + 1, client.v + 1))
+    students = list(range(1, client.students + 1))
+    for i in range(client.k):
+        dict = client.scout(vertices[i], students)
+        sum = 0
+        for std in students:
+            if dict[std] == True:
+                sum = sum + 1
+        p.append(sum)
+    return p
