@@ -20,12 +20,12 @@ def solve(client):
     client.end()
     client.start()
     
-
-    '''
-    print("\n    Students' estimation of bot's existance of every vertex:\n    ", 
-        votes(client))
-    '''
+    MST = nx.minimum_spanning_tree(client.G)
+    # print(sorted(MST.edges(data = True)))
+    dfs_edge = list(nx.edge_dfs(MST, source = client.home))
+    print(dfs_edge)
     
+    for i in range(client.v - 2, -1, -1):
+        client.remote(dfs_edge[i][1], dfs_edge[i][0])
+
     client.end()
-
-
