@@ -19,14 +19,27 @@ To test locally, please do the following:
 def solve(client):
     client.end()
     client.start()
-    
-    MST = nx.minimum_spanning_tree(client.G)
-    # print(sorted(MST.edges(data = True)))
-    dfs_edge = list(nx.edge_dfs(MST, source = client.home))
-    print(dfs_edge)
-    
-    for i in range(client.v - 2, -1, -1):
-        client.remote(dfs_edge[i][1], dfs_edge[i][0])
 
+    vote = votes(client)
+    
+    newG = nx.Graph()
+    for e in list(client.G.edges):
+        weight = client.G.edges[e[0], e[1]]['weight']
+        weight = weight * (1 - vote[e[0] - 1] / client.k)
+        newG.add_edge(e[0], e[1], weight = weight)
+
+    MST = nx.minimum_spanning_tree(newG)
+    # print(sorted(MST.edges(data = True)))
+    bfs_edge = list(nx.edge_bfs(MST, source = client.home))
+    # print(dfs_edge)
+    
+    foundBot = 0
+    for i in range(client.v - 2, -1, -1):
+        if (foundBot < client.l):
+            foundBot = foundBot - client.bot_count[bfs_edge[i][1]] + client.remote(bfs_edge[i][1], bfs_edge[i][0])
+        else:
+            if (client.bot_count[bfs_edge[i][1]] > 0):
+                client.remote(bfs_edge[i][1], bfs_edge[i][0])
+    
     client.end()
     print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)

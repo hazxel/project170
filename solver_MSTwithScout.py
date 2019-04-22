@@ -19,11 +19,19 @@ To test locally, please do the following:
 def solve(client):
     client.end()
     client.start()
+
+    vote = votes(client)
     
-    MST = nx.minimum_spanning_tree(client.G)
+    newG = nx.Graph()
+    for e in list(client.G.edges):
+        weight = client.G.edges[e[0], e[1]]['weight']
+        weight = weight * (1 - vote[e[0] - 1] / client.k)
+        newG.add_edge(e[0], e[1], weight = weight)
+
+    MST = nx.minimum_spanning_tree(newG)
     # print(sorted(MST.edges(data = True)))
     dfs_edge = list(nx.edge_dfs(MST, source = client.home))
-    print(dfs_edge)
+    # print(dfs_edge)
     
     for i in range(client.v - 2, -1, -1):
         client.remote(dfs_edge[i][1], dfs_edge[i][0])

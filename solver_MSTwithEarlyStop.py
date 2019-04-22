@@ -22,11 +22,16 @@ def solve(client):
     
     MST = nx.minimum_spanning_tree(client.G)
     # print(sorted(MST.edges(data = True)))
-    dfs_edge = list(nx.edge_dfs(MST, source = client.home))
-    print(dfs_edge)
+    bfs_edge = list(nx.edge_bfs(MST, source = client.home))
+    # print(bfs_edge)
     
+    foundBot = 0
     for i in range(client.v - 2, -1, -1):
-        client.remote(dfs_edge[i][1], dfs_edge[i][0])
-
+        if (foundBot < client.l):
+            foundBot = foundBot - client.bot_count[bfs_edge[i][1]] + client.remote(bfs_edge[i][1], bfs_edge[i][0])
+        else:
+            if (client.bot_count[bfs_edge[i][1]] > 0):
+                client.remote(bfs_edge[i][1], bfs_edge[i][0])
+    
     client.end()
     print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)
