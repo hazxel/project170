@@ -32,7 +32,7 @@ def probability(client):
             for std in students:
                 if dict[std] == True:
                     sum = sum + 1
-            p.append(sum)
+            p.append(sum / client.k)
     return p
 
 
@@ -57,3 +57,9 @@ def printGraphInfo(client):
     for (u, v, wt) in client.G.edges.data('weight'):
         print('(%d, %d, %.3f)' % (u, v, wt))
     '''
+
+
+### Remote all the bots home when all L bots are found
+# this apply 
+def remoteKnownBot(client, positions):
+    pass
