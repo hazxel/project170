@@ -33,5 +33,6 @@ def solve(client):
         if counter == client.l:
             break
 
-    client.end()
+    score = client.end()
     print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)
+    return score
