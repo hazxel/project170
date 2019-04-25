@@ -1,3 +1,6 @@
+import networkx as nx
+from heapq import*
+
 ### Returns a list which shows the number of students who believe there exists a bot on a certain vertex.
 ### Be careful that this function runs client.scout() k*v times.
 def votes(client):
@@ -60,6 +63,52 @@ def printGraphInfo(client):
 
 
 ### Remote all the bots home when all L bots are found
-# this apply 
-def remoteKnownBot(client, positions):
-    pass
+# Based on MST
+# This function should be used after all bots are found
+# Finished but UNTESTED, correctness unknown
+def remoteKnownBotHome(client):
+    knownBots = [client.h]
+    for i in range(client.v):
+        if (client.bot_count[i] > 0):
+            knownBots.append(i)
+    newG = nx.Graph()
+    for i in range(len(knownBots)):
+        newG.add_node(knownBots[i])
+    for (u, v, wt) in client.G.edges.data('weight'):
+        if u in knownBots and v in knownBots:
+            newG.add_edge(u, v, weight = wt)
+
+    MST = nx.minimum_spanning_tree(newG)
+    bfs_edge = list(nx.edge_bfs(MST, source = client.home))
+
+    for edge in bfs_edge:
+        client.remote(edge[1], edge[0])
+
+
+
+### Find all the l bots based on the vote of the students.
+# We want to check what is students' possibility to make a mistake
+# Unfinished
+def findAllBots(client):
+    vote = votes(client)
+    
+
+### Return the shortest path
+# based on dijkstra
+def shortestPathfromHome(client):
+    SP = nx.single_source_shortest_path(client.G, client.h)
+    return SP
+
+
+### Remote from a specific vertex to home along shortest path
+# Input
+# Return # of bots actually gets home
+# Based on dijkstra
+# Unfinished
+def remoteHome(client, shortestPaths, vertex):
+    path = shortestPaths[vertex]
+    path = path[::-1]
+    r = 0
+    for i in range(len(path) - 1):
+        r = client.remote(path[i], path[i + 1])
+    return r

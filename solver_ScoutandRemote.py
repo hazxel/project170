@@ -1,6 +1,8 @@
 import networkx as nx
+import numpy as np
 import random
 from helper_functions import*
+from heapq import*
 
 '''
 To test locally, please do the following:
@@ -21,25 +23,15 @@ def solve(client):
     client.start()
 
     vote = votes(client)
-    
-    newG = nx.Graph()
-    for e in list(client.G.edges):
-        wt = client.G.edges[e[0], e[1]]['weight']
-        wt = wt * (1 - vote[e[0] - 1] / client.k)
-        newG.add_edge(e[0], e[1], weight = wt)
+    vote = np.array(vote)
+    seq = vote.argsort()
+    seq = seq[::-1]
 
-    MST = nx.minimum_spanning_tree(newG)
-    # print(sorted(MST.edges(data = True)))
-    bfs_edge = list(nx.edge_bfs(MST, source = client.home))
-    # print(dfs_edge)
-    
-    foundBot = 0
-    for i in range(client.v - 2, -1, -1):
-        if (foundBot < client.l):
-            foundBot = foundBot - client.bot_count[bfs_edge[i][1]] + client.remote(bfs_edge[i][1], bfs_edge[i][0])
-        else:
-            if (client.bot_count[bfs_edge[i][1]] > 0):
-                client.remote(bfs_edge[i][1], bfs_edge[i][0])
-    
+    counter = 0
+    for i in seq:
+        counter = counter + remoteHome(client,shortestPathfromHome(client), i + 1)
+        if counter == client.l:
+            break
+
     client.end()
     print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)
