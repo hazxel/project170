@@ -1,8 +1,10 @@
 import networkx as nx
 from heapq import*
 
-### Returns a list which shows the number of students who believe there exists a bot on a certain vertex.
+### Returns a list which stores all the information we get from scout()
 ### Be careful that this function runs client.scout() k*v times.
+# Input: -
+# Output: A list showing the number of students who believe there exists a bot on a certain vertex.
 def votes(client):
     p = []
     vertices = list(range(1, client.v + 1))
@@ -20,8 +22,11 @@ def votes(client):
     return p
 
 
-### Returns a list which shows the proportion of students who believe there exists a bot on a certain vertex.
+### Returns a list which shows the probability of bots' existance on a certain vertex.
 ### Be careful that this function runs client.scout() k*v times.
+### Very similar to votes()
+# Input: -
+# Output: A list showing the proportion of students who believe there exists a bot on a certain vertex.
 def probability(client):
     p = []
     vertices = list(range(1, client.v + 1))
@@ -95,16 +100,19 @@ def findAllBots(client):
 
 ### Return the shortest path
 # based on dijkstra
+# Untested
 def shortestPathfromHome(client):
     SP = nx.single_source_shortest_path(client.G, client.h)
     return SP
 
 
 ### Remote from a specific vertex to home along shortest path
-# Input
-# Return # of bots actually gets home
-# Based on dijkstra
-# Unfinished
+### Based on dijkstra
+### Correctness guaranteed
+# Input: a list of shortest paths with home as single source
+#        a vertex we want to remote home from
+# Return: number of bots actually got home
+
 def remoteHome(client, shortestPaths, vertex):
     path = shortestPaths[vertex]
     path = path[::-1]
@@ -112,3 +120,29 @@ def remoteHome(client, shortestPaths, vertex):
     for i in range(len(path) - 1):
         r = client.remote(path[i], path[i + 1])
     return r
+
+
+### Estimate the accuracy of scout()
+### Based on the variance and distribution of vote()
+### Assume that accuracy is always larger than 50%
+# Input: a list of vote info
+# Output: Overall statistical estimation of accuracy of scout
+# Unfinished
+def estimatedAccuracy(client, vote):
+    stdNum = client.k
+    vNum = client.v
+    botNum = client.l
+
+    # if students are 100% correct:
+    correctVoteNum = vNum * stdNum
+    actualVoteNum = sum(vote)
+
+    # Say that students' accuracy is p
+    # Then on vertices we have a bot, we get approximately k * p votes
+    # And for vertices don't have a bot, we get approximately k * (1 - p) votes
+    # So overall expected votes should be l * k * p + (v - l) * k * (1 - p) = (l - v + l) * k * p + (v - 1) * k
+    # So, estemated p = (SumOfVote - (v - 1) * k) / ((l - v + l) * k)
+
+    p = (actualVoteNum - (vNum - botNum) * stdNum) / ((botNum - vNum + botNum) * stdNum)
+
+    return p

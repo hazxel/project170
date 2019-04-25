@@ -23,6 +23,7 @@ def solve(client):
     client.start()
 
     vote = votes(client)
+    print('The estimated accuracy of students is '+str(estimatedAccuracy(client, vote)))
     vote = np.array(vote)
     seq = vote.argsort()
     seq = seq[::-1]
