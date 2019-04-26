@@ -2,7 +2,7 @@
 from solver_ScoutandRemote import*
 from ModifiedClient import*
 
-N = 20
+N = 10
 
 c = Client(False)
 

@@ -21,7 +21,14 @@ from requests import Session
 import time
 
 LOCAL_URL = 'http://127.0.0.1:5000/api/'
-REMOTE_URL = 'http://guavabot-api.cs170.org/'
+# Just in case:
+# REMOTE_URL = 'http://guavabot-api.cs170.org/'
+REMOTE_URL = 'http://127.0.0.1:5000/api/'
+
+
+PRINT_SCOUT_INFO = False
+PRINT_REMOTE_INFO = False
+
 
 ### Implements a stateful client that interacts with the server.
 class Client:
@@ -118,6 +125,7 @@ class Client:
         self.cant_scout = [set() for _ in range(self.k + 1)]
         self.bot_count = [0] * (self.n + 1)
 
+        print('')
         self.__print__('/start API Call succeeded (home = ' + str(self.home)
             + ', students = ' + str(self.students) + ', bots = '
             + str(self.bots) + ', scout_time = ' + str(self.scout_time) + ')!')
@@ -171,10 +179,12 @@ class Client:
 
         self.time = response['time']
 
-        # self.__print__('/scout API Call succeeded (v = ' + str(vertex)
-        #     + ', s = ' + str(students) + ')! '
-        #     + 'Bots found by students ' + ', '.join([str(student) \
-        #         for student, found in response['reports'].items() if found]))
+        if PRINT_SCOUT_INFO:
+            self.__print__('/scout API Call succeeded (v = ' + str(vertex)
+                + ', s = ' + str(students) + ')! '
+                + 'Bots found by students ' + ', '.join([str(student) \
+                    for student, found in response['reports'].items() if found]))
+
         return response['reports']
 
     ### Remotes all bots along edge frum->to. In other words, all bots (if any)
@@ -231,9 +241,12 @@ class Client:
         self.bot_count[frum] = 0
         self.bot_count[to] += response['bots_remoted']
 
-        # self.__print__('/remote API Call succeeded (edge = '
-        #     + str(frum) + '->' + str(to) + ')! ' + str(response['bots_remoted'])
-        #    + ' bot(s) remoted.')
+        if PRINT_REMOTE_INFO:
+            self.__print__('/remote API Call succeeded (edge = '
+                + str(frum) + '->' + str(to) + ')! ' + str(response['bots_remoted'])
+                + ' bot(s) remoted, ' 
+                + 'edge weight = ' + str(self.graph.edges[frum, to]['weight']))
+                
         return response['bots_remoted']
 
     ### Terminates the active rescue, regardless of if all bots have returned
@@ -244,8 +257,9 @@ class Client:
         status_code, response = self.__request__('end', {})
         if status_code in [400, 401, 403]:
             self.__print__('/end API ' + str(status_code) + ' Error: '
-                + response['error'] + '. See ' + response['documentation_url']
-                + ' for more details.')
+                + response['error'] )
+                # + '. See ' + response['documentation_url']
+                # + ' for more details.')
             return False
         elif status_code != 200:
             self.__print__('/end API ' + status_code + ' Error.')

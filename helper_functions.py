@@ -1,5 +1,4 @@
 import networkx as nx
-from heapq import*
 
 ### Returns a list which stores all the information we get from scout()
 ### Be careful that this function runs client.scout() k*v times.
@@ -134,15 +133,29 @@ def estimatedAccuracy(client, vote):
     botNum = client.l
 
     # if students are 100% correct:
-    correctVoteNum = vNum * stdNum
+    # correctVoteNum = vNum * stdNum
     actualVoteNum = sum(vote)
 
     # Say that students' accuracy is p
-    # Then on vertices we have a bot, we get approximately k * p votes
-    # And for vertices don't have a bot, we get approximately k * (1 - p) votes
-    # So overall expected votes should be l * k * p + (v - l) * k * (1 - p) = (l - v + l) * k * p + (v - 1) * k
-    # So, estemated p = (SumOfVote - (v - 1) * k) / ((l - v + l) * k)
+    # Then on every vertex we have a bot, we get approximately k * p votes
+    # And for each vertex doesn't exist a bot, we get approximately k * (1 - p) votes
+    # So overall expected votes should be l * k * p + (v - l) * k * (1 - p) = (2 * l - v) * k * p + (v - l) * k
+    # So, estemated p = (SumOfVote - (v - 1) * k) / ((2 * l - v) * k)
 
     p = (actualVoteNum - (vNum - botNum) * stdNum) / ((botNum - vNum + botNum) * stdNum)
 
     return p
+
+
+### Print the distribution of vote
+# Input: list of vote
+# Output: -
+def printVote(vote):
+    stat = {}
+    for i, vo in enumerate(vote):
+        if vo not in stat.keys():
+            stat[vo] = []
+        stat[vo].append(i+1)
+    print('Votes distribution:')
+    for j in sorted(stat):
+        print("    votes: {}, vertices {}".format(j, stat[j]))
