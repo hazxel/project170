@@ -20,14 +20,12 @@ def solve(client):
     client.end()
     client.start()
     
-    # vote = votes(client)
+    # print(shortestPathfromHome(client)[1][::-1])
 
-
-    print(shortestPathfromHome(client)[1][::-1])
-
-    # findAllBots(client)
+    findAllBots(client)
 
     # remoteKnownBotHome(client)
     
-    client.end()
+    score = client.end()
     print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)
+    return score

@@ -1,15 +1,19 @@
 
-from solver_ScoutandRemote import*
+from solver_FindAllandRemote import*
 from ModifiedClient import*
 
-N = 10
+N = 100
 
 c = Client(False)
 
 score = 0
 
 for i in range(N):
-    score += solve(c)
+    s = solve(c)
+    if s < 80:
+        raise Exception("found it")
+    score += s
+    
 
 score /= N
 

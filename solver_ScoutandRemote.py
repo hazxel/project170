@@ -2,7 +2,6 @@ import networkx as nx
 import numpy as np
 import random
 from helper_functions import*
-from heapq import*
 
 '''
 To test locally, please do the following:
@@ -23,7 +22,7 @@ def solve(client):
     client.start()
 
     vote = votes(client)
-    print('The estimated accuracy of students is '+str(estimatedAccuracy(client, vote)))
+    print('The estimated accuracy of students is ' + str(estimatedAccuracy(client, vote)))
     vote = np.array(vote)
     # printVote(vote)
     seq = vote.argsort()

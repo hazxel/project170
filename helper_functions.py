@@ -1,4 +1,6 @@
 import networkx as nx
+import numpy as np
+import math
 
 ### Returns a list which stores all the information we get from scout()
 ### Be careful that this function runs client.scout() k*v times.
@@ -90,12 +92,81 @@ def remoteKnownBotHome(client):
 
 
 
-### Find all the l bots based on the vote of the students.
-# We want to check what is students' possibility to make a mistake
-# Unfinished
+### First remote without considering weight
+# When accuracy is bad, start to consider weight
 def findAllBots(client):
     vote = votes(client)
+    # print('The estimated accuracy of students is '+str(estimatedAccuracy(client, vote)))
+    vote = np.array(vote)
+    printVote(vote)
+    ac = estimatedAccuracy(client, vote)
+    print("Accuracy is: " + str(ac))
+    seq = vote.argsort()
+    seq = seq[::-1]
+    seq = seq + 1
+    count = 0
+
+    Q = [] # vertices in Q must be checked anyway
+    for i in range(client.l):
+        Q.append(seq[0])
+        seq = np.delete(seq,[0])
+    while (count < client.l - 1):
+        minW = 100000
+        for i in range(1, len(Q)):
+            if client.G.edges[Q[0], Q[i]]['weight'] < minW:
+                minW = client.G.edges[Q[0], Q[i]]['weight']
+                to = i
+        knownBots = client.bot_count[Q[0]]
+        frum = int(Q[0])
+        to = int(Q[to])
+        if client.G.edges[Q[0], client.h]['weight'] < minW:
+            to = client.h
+        # print("known bots: " + str(knownBots))
+        count = count + client.remote(frum, to) - knownBots
+        # print("Count is: " + str(count))
+        del Q[0]
+        if len(Q) < client.l - count:
+            nextAcc = calCorrectProb(client, vote, ac, seq[0])
+            if nextAcc < 0.6:
+                break
+            Q.append(seq[0])
+            seq = np.delete(seq,[0])
     
+    knownBots = client.bot_count[Q[0]]
+    count = count + client.remote(int(Q[0]), client.h) - knownBots
+    del Q[0]
+    print("Now directly remote home:")
+    print("Count is: " + str(count))
+
+    costinSeq = []
+    for v in Q:
+        seq = np.append(v, seq)
+    seq = seq.tolist()
+    seq.remove(client.h)
+    seq = np.array(seq)
+    for v in seq:
+        punishment = 1
+        if calCorrectProb(client, vote, ac, v) < 0.2:
+            punishment = 1.5
+        if v != client.h:
+            costinSeq.append((1 - calCorrectProb(client, vote, ac, v)) * client.G.edges[v, client.h]['weight'] * punishment)
+
+    costinSeq = np.array(costinSeq)
+    newSeq = costinSeq.argsort()
+
+    print("seq now have:")
+    print(seq)
+    print("estimated cost weight are:")
+    print(costinSeq)
+    print("in this sequence: ")
+    print(newSeq)
+    for i in newSeq:
+        # print("count: " + str(count))
+        if count == client.l:
+            break
+        knownBots = client.bot_count[int(seq[i])]
+        count = count + client.remote(int(seq[i]), client.h) - knownBots
+
 
 ### Return the shortest path
 # based on dijkstra
@@ -159,3 +230,13 @@ def printVote(vote):
     print('Votes distribution:')
     for j in sorted(stat):
         print("    votes: {}, vertices {}".format(j, stat[j]))
+
+
+### Calculate the probability of bots' existance on the vertex
+# Use the overall students' accuracy to estimate the correctness of a certain vertex
+def calCorrectProb(client, vote, accuracy, vertex):
+    vertex = vertex - 1
+    rightProb = math.factorial(client.k) / math.factorial(client.k - vote[vertex]) / math.factorial(vote[vertex]) * accuracy**vote[vertex] * (1 - accuracy)**(client.k - vote[vertex])
+    leftProb = math.factorial(client.k) / math.factorial(client.k - vote[vertex]) / math.factorial(vote[vertex]) * (1 - accuracy)**vote[vertex] * accuracy**(client.k - vote[vertex])
+    prob = rightProb / (rightProb + leftProb)
+    return prob
