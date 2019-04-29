@@ -54,19 +54,15 @@ def solve(client):
     # remote based on predefined ordering until we find all bots
     counter = 0
     for segment in segments:
-        if counter == client.l:
-            break
         if segment == vertex_above_30:
             print("Touched segments below 50% probability")
         if segment == vertex_below_30:
             print("Touched segments below 30% probability")
         for vertex in segment:
-            if counter == client.l:
-                break
             counter = counter + remote_home(client, shortest_path, vertex + 1)
-
-    score = client.end()
-    return score
+            if counter == client.l:
+                score = client.end()
+                return score
 
 
 def votes(client):
