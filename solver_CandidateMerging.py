@@ -1,4 +1,5 @@
 import networkx as nx
+from helper_functions import *
 
 
 # python local_server.py
@@ -13,8 +14,26 @@ import networkx as nx
 
 
 def solve(client):
+    client.end()
     client.start()
-    vote_array = votes(client)
+
+    """
+    Limit the number of students:
+        If (average edge weight/number of vertices) << number of students,
+        then we risk wasting to much cost on scouting. Limit the students to be 
+        min(3~7 * (Average Edge Weight/number of vertices), number of students),
+        where the 3~7 range in the min is entirely empirical and can be changed.
+        Mathmatically, the cost to remote all vertices is k*v. The cost for the 
+        fomula above can be realized as min(3~7 * AEW/v, number of students) * v.
+    """
+    ##### Hyperparameter. Must be Non-negative integer
+    alpha = 3
+
+    # Cap the number of students we use for voting
+    ratio = averageEdgeWeight_numOfVertices(client)
+    print("Number of students used:", min(client.students, round(ratio * alpha)))
+    vote_array = votes(client, round(ratio * alpha))
+
 
     # sort the vertices based on student votes
     vertices = list(range(client.v))
@@ -61,39 +80,15 @@ def solve(client):
             if candidate == target:
                 continue
             if shortest_path_to_target_length[candidate] < shortest_path_to_home_length[candidate]:
-                bots_moved_to_target += remote_path(client, shortest_path_to_target, candidate)
+                bots_moved_to_target += remoteHome(client, shortest_path_to_target, candidate)
                 candidates.remove(candidate)
             else:
-                counter += remote_path(client, shortest_path_to_home, candidate)
+                counter += remoteHome(client, shortest_path_to_home, candidate)
                 candidates.remove(candidate)
 
         # finally remote from target to home, potentially carrying many bots
-        counter += remote_path(client, shortest_path_to_home, target)
+        counter += remoteHome(client, shortest_path_to_home, target)
         candidates.remove(target)
 
     score = client.end()
     return score
-
-
-def votes(client):
-    vote_array = []
-    for v in range(client.v):
-        if v + 1 == client.h:
-            vote_array.append(0)
-        else:
-            results = client.scout(v + 1, list(range(1, client.k + 1)))
-            sum = 0
-            for s in range(client.k):
-                if results[s + 1]:
-                    sum += 1
-            vote_array.append(sum)
-    return vote_array
-
-
-def remote_path(client, shortest_paths, vertex):
-    path = shortest_paths[vertex]
-    path = path[::-1]
-    action = 0
-    for e in range(len(path) - 1):
-        action = client.remote(path[e], path[e + 1])
-    return action

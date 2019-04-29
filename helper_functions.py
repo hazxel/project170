@@ -14,16 +14,15 @@ def votes(client, num_students_samples=None):
     if not num_students_samples or num_students_samples >= client.students:
         students = list(range(1, client.students + 1))
     else:
-        print("Number of students used:", num_students_samples)
         students = np.random.choice(np.arange(1, client.students + 1), num_students_samples, replace=False).tolist()
     for i in range(client.v):
         if (vertices[i] == client.home):
             p.append(0)
         else:
-            dict = client.scout(vertices[i], students)
+            results = client.scout(vertices[i], students)
             sum = 0
             for std in students:
-                if dict[std] == True:
+                if results[std] == True:
                     sum = sum + 1
             p.append(sum)
     return p
