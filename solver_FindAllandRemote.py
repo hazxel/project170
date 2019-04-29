@@ -1,6 +1,6 @@
 import networkx as nx
 import random
-from helper_functions import*
+from helper_functions import *
 
 '''
 To test locally, please do the following:
@@ -16,16 +16,17 @@ To test locally, please do the following:
     In both terminals, you should see a slew of scout and remote calls succeeding. At the bottom of the client terminal your score is shown. The score should be very low (since it's unlikely all bots were moved home).
 '''
 
+
+# average score: 93.36935455521139
+
 def solve(client):
     client.end()
     client.start()
-    
+
     # print(shortestPathfromHome(client)[1][::-1])
-
     findAllBots(client)
-
     # remoteKnownBotHome(client)
-    
+
     score = client.end()
-    print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)
+    print("The input was: V", client.v, " E: ", client.e, " L: ", client.l, " K: ", client.k)
     return score

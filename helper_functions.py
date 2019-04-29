@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 import math
 
+
 ### Returns a list which stores all the information we get from scout()
 ### Be careful that this function runs client.scout() k*v times.
 # Input: -
@@ -45,7 +46,6 @@ def probability(client):
     return p
 
 
-
 ### Print some information about the graph, including:
 # Home vertex
 # Numer of Student
@@ -82,14 +82,13 @@ def remoteKnownBotHome(client):
         newG.add_node(knownBots[i])
     for (u, v, wt) in client.G.edges.data('weight'):
         if u in knownBots and v in knownBots:
-            newG.add_edge(u, v, weight = wt)
+            newG.add_edge(u, v, weight=wt)
 
     MST = nx.minimum_spanning_tree(newG)
-    bfs_edge = list(nx.edge_bfs(MST, source = client.home))
+    bfs_edge = list(nx.edge_bfs(MST, source=client.home))
 
     for edge in bfs_edge:
         client.remote(edge[1], edge[0])
-
 
 
 ### First remote without considering weight
@@ -106,10 +105,10 @@ def findAllBots(client):
     seq = seq + 1
     count = 0
 
-    Q = [] # vertices in Q must be checked anyway
+    Q = []  # vertices in Q must be checked anyway
     for i in range(client.l):
         Q.append(seq[0])
-        seq = np.delete(seq,[0])
+        seq = np.delete(seq, [0])
     while (count < client.l - 1):
         minW = 100000
         for i in range(1, len(Q)):
@@ -130,8 +129,8 @@ def findAllBots(client):
             if nextAcc < 0.6:
                 break
             Q.append(seq[0])
-            seq = np.delete(seq,[0])
-    
+            seq = np.delete(seq, [0])
+
     knownBots = client.bot_count[Q[0]]
     count = count + client.remote(int(Q[0]), client.h) - knownBots
     del Q[0]
@@ -149,7 +148,8 @@ def findAllBots(client):
         if calCorrectProb(client, vote, ac, v) < 0.2:
             punishment = 1.5
         if v != client.h:
-            costinSeq.append((1 - calCorrectProb(client, vote, ac, v)) * client.G.edges[v, client.h]['weight'] * punishment)
+            costinSeq.append(
+                (1 - calCorrectProb(client, vote, ac, v)) * client.G.edges[v, client.h]['weight'] * punishment)
 
     costinSeq = np.array(costinSeq)
     newSeq = costinSeq.argsort()
@@ -214,7 +214,6 @@ def estimatedAccuracy(client, vote):
     # So, estemated p = (SumOfVote - (v - 1) * k) / ((2 * l - v) * k)
 
     p = (actualVoteNum - (vNum - botNum) * stdNum) / ((botNum - vNum + botNum) * stdNum)
-
     return p
 
 
@@ -226,7 +225,7 @@ def printVote(vote):
     for i, vo in enumerate(vote):
         if vo not in stat.keys():
             stat[vo] = []
-        stat[vo].append(i+1)
+        stat[vo].append(i + 1)
     print('Votes distribution:')
     for j in sorted(stat):
         print("    votes: {}, vertices {}".format(j, stat[j]))
@@ -236,7 +235,9 @@ def printVote(vote):
 # Use the overall students' accuracy to estimate the correctness of a certain vertex
 def calCorrectProb(client, vote, accuracy, vertex):
     vertex = vertex - 1
-    rightProb = math.factorial(client.k) / math.factorial(client.k - vote[vertex]) / math.factorial(vote[vertex]) * accuracy**vote[vertex] * (1 - accuracy)**(client.k - vote[vertex])
-    leftProb = math.factorial(client.k) / math.factorial(client.k - vote[vertex]) / math.factorial(vote[vertex]) * (1 - accuracy)**vote[vertex] * accuracy**(client.k - vote[vertex])
+    rightProb = math.factorial(client.k) / math.factorial(client.k - vote[vertex]) / math.factorial(
+        vote[vertex]) * accuracy ** vote[vertex] * (1 - accuracy) ** (client.k - vote[vertex])
+    leftProb = math.factorial(client.k) / math.factorial(client.k - vote[vertex]) / math.factorial(
+        vote[vertex]) * (1 - accuracy) ** vote[vertex] * accuracy ** (client.k - vote[vertex])
     prob = rightProb / (rightProb + leftProb)
     return prob

@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 import random
-from helper_functions import*
+from helper_functions import *
 
 '''
 To test locally, please do the following:
@@ -17,6 +17,9 @@ To test locally, please do the following:
     In both terminals, you should see a slew of scout and remote calls succeeding. At the bottom of the client terminal your score is shown. The score should be very low (since it's unlikely all bots were moved home).
 '''
 
+
+# average score: 90.78084105267297
+
 def solve(client):
     client.end()
     client.start()
@@ -30,10 +33,10 @@ def solve(client):
 
     counter = 0
     for i in seq:
-        counter = counter + remoteHome(client,shortestPathfromHome(client), i + 1)
+        counter = counter + remoteHome(client, shortestPathfromHome(client), i + 1)
         if counter == client.l:
             break
 
     score = client.end()
-    print("The input was: V", client.v ," E: ", client.e, " L: ", client.l, " K: ", client.k)
+    print("The input was: V", client.v, " E: ", client.e, " L: ", client.l, " K: ", client.k)
     return score
