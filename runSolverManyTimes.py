@@ -1,7 +1,7 @@
-from solver_DistributionSegment import *
+from solver_FindAllandRemote import *
 from ModifiedClient import *
 
-N = 5
+N = 100
 c = Client(False)
 score = 0
 

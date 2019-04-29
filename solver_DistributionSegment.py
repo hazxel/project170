@@ -4,7 +4,7 @@ import networkx as nx
 # python local_server.py
 # python client.py --solver solver_DistributionSegment
 # python runSolverManyTimes.py
-# average score: 91.25701361131173
+# average score: 91.701294253001
 
 
 def solve(client):
