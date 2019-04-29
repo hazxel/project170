@@ -3,13 +3,15 @@ from ModifiedClient import *
 
 N = 100
 c = Client(False)
-score = 0
+score = []
 
 for i in range(N):
     print("Starting run #", i+1)
     s = solve(c)
-    score += s
+    score.append(s)
 
-score /= N
+score_all = np.mean(score)
+score_top_87 = np.mean(np.sort(score)[::-1][:int(np.ceil(len(score) * 0.87))])
 
-print('Have run ' + str(N) + ' tests, the average score is: ' + str(score))
+print('Have run ' + str(N) + ' tests, the average score is: ' + str(score_all))
+print('Have run ' + str(N) + ' tests, the top 87%  score is: ' + str(score_top_87))

@@ -7,10 +7,15 @@ import math
 ### Be careful that this function runs client.scout() k*v times.
 # Input: -
 # Output: A list showing the number of students who believe there exists a bot on a certain vertex.
-def votes(client):
+def votes(client, num_students_samples=None):
     p = []
     vertices = list(range(1, client.v + 1))
-    students = list(range(1, client.students + 1))
+    # Number of students we use
+    if not num_students_samples or num_students_samples >= client.students:
+        students = list(range(1, client.students + 1))
+    else:
+        print("Number of students used:", num_students_samples)
+        students = np.random.choice(np.arange(1, client.students + 1), num_students_samples, replace=False).tolist()
     for i in range(client.v):
         if (vertices[i] == client.home):
             p.append(0)
@@ -66,6 +71,21 @@ def printGraphInfo(client):
     for (u, v, wt) in client.G.edges.data('weight'):
         print('(%d, %d, %.3f)' % (u, v, wt))
     '''
+
+### Computes the average edge weights
+def averageEdgeWeight(client):
+    average_EW = 0
+    print("    Number of edges: ", client.e)
+    for (_, _, wt) in client.G.edges.data('weight'):
+        average_EW += wt/client.e
+
+    print("    Average Edge weights: ", average_EW)
+    return average_EW
+
+### Computes the average edge weights/number of vertices ratio
+def averageEdgeWeight_numOfVertices(client):
+    print("    Number of vertices: ", client.v)
+    return averageEdgeWeight(client) / client.v
 
 
 ### Remote all the bots home when all L bots are found
