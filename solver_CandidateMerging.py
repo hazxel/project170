@@ -16,24 +16,7 @@ from helper_functions import *
 def solve(client):
     client.end()
     client.start()
-
-    """
-    Limit the number of students:
-        If (average edge weight/number of vertices) << number of students,
-        then we risk wasting to much cost on scouting. Limit the students to be 
-        min(3~7 * (Average Edge Weight/number of vertices), number of students),
-        where the 3~7 range in the min is entirely empirical and can be changed.
-        Mathmatically, the cost to remote all vertices is k*v. The cost for the 
-        fomula above can be realized as min(3~7 * AEW/v, number of students) * v.
-    """
-    ##### Hyperparameter. Must be Non-negative integer
-    alpha = 3
-
-    # Cap the number of students we use for voting
-    ratio = averageEdgeWeight_numOfVertices(client)
-    print("Number of students used:", min(client.students, round(ratio * alpha)))
-    vote_array = votes(client, round(ratio * alpha))
-
+    vote_array = votes(client)
 
     # sort the vertices based on student votes
     vertices = list(range(client.v))
