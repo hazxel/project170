@@ -33,12 +33,12 @@ def solve(client):
         shortest_path_to_home_length[vertex] = distance
 
     # maintain a candidates list of length bots_left
-    bots_moved_to_home = 0
+    counter = 0
     vertex_index = 0
     candidates = []
-    while bots_moved_to_home < client.l:
+    while counter < client.l:
         # at the start of loop always refill candidates
-        for _ in range(client.l - bots_moved_to_home - len(candidates)):
+        for _ in range(client.l - counter - len(candidates)):
             candidates.append(vertices[vertex_index] + 1)
             vertex_index += 1
 
@@ -64,11 +64,11 @@ def solve(client):
                 bots_moved_to_target += remote_path(client, shortest_path_to_target, candidate)
                 candidates.remove(candidate)
             else:
-                bots_moved_to_home += remote_path(client, shortest_path_to_home, candidate)
+                counter += remote_path(client, shortest_path_to_home, candidate)
                 candidates.remove(candidate)
 
         # finally remote from target to home, potentially carrying many bots
-        bots_moved_to_home += remote_path(client, shortest_path_to_home, target)
+        counter += remote_path(client, shortest_path_to_home, target)
         candidates.remove(target)
 
     score = client.end()

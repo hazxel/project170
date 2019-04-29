@@ -17,7 +17,7 @@ To test locally, please do the following:
 '''
 
 
-# average score: 91.2088569985147
+# average score: 92.10480839493329
 
 def solve(client):
     client.end()
