@@ -1,7 +1,7 @@
 from solver_DistributionSegment import *
 from ModifiedClient import *
 
-N = 20
+N = 5
 c = Client(False)
 score = 0
 

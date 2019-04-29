@@ -1,34 +1,16 @@
 import networkx as nx
-import numpy as np
-import random
-from helper_functions import *
-
-'''
-To test locally, please do the following:
-
-    Run the local server using "python local_server.py“ in terminal.
-
-    This will start a web server that your client will now connect to. It will pick a random input instance to serve. 
-    An instance is a set of parameters (such as bot locations or student correctness) of the problem.
-
-    In a separate terminal, run "python client.py --solver solver". The --solver flag indicates the solver python file 
-    the client should use. It's the file name of your solver, with .py omitted.
-
-    If you want to try a different solver run "python client.py --solver <MY_SOLVER_NAME>"
-
-    In both terminals, you should see a slew of scout and remote calls succeeding. At the bottom of the client terminal 
-    your score is shown. The score should be very low (since it's unlikely all bots were moved home).
-'''
 
 
+# python local_server.py
+# python client.py --solver solver_DistributionSegment
+# python runSolverManyTimes.py
 # average score: 91.25701361131173
 
 
 def solve(client):
     client.end()
     client.start()
-    vote_raw = votes(client)
-    vote_array = np.array(vote_raw)
+    vote_array = votes(client)
 
     # grab the distribution, find probabilities by client.k
     distribution = {}
@@ -67,7 +49,7 @@ def solve(client):
         shortest_path_length[vertex] = distance
 
     for segment in segments:
-        segment.sort(key=lambda v: shortest_path_length[v+1])
+        segment.sort(key=lambda v: shortest_path_length[v + 1])
 
     # remote based on predefined ordering until we find all bots
     counter = 0
@@ -81,8 +63,31 @@ def solve(client):
         for vertex in segment:
             if counter == client.l:
                 break
-            counter = counter + remoteHome(client, shortestPathfromHome(client), vertex + 1)
+            counter = counter + remote_home(client, shortest_path, vertex + 1)
 
     score = client.end()
-    # print("The input was: V", client.v, " E: ", client.e, " L: ", client.l, " K: ", client.k)
     return score
+
+
+def votes(client):
+    vote_array = []
+    for v in range(client.v):
+        if v + 1 == client.h:
+            vote_array.append(0)
+        else:
+            results = client.scout(v + 1, list(range(1, client.k + 1)))
+            sum = 0
+            for s in range(client.k):
+                if results[s + 1]:
+                    sum += 1
+            vote_array.append(sum)
+    return vote_array
+
+
+def remote_home(client, shortest_paths, vertex):
+    path = shortest_paths[vertex]
+    path = path[::-1]
+    action = 0
+    for e in range(len(path) - 1):
+        action = client.remote(path[e], path[e + 1])
+    return action
