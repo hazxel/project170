@@ -6,9 +6,11 @@ import networkx as nx
 # python runSolverManyTimes.py
 # average score: 91.701294253001
 
+# invariants:
+#   the vertices are always processed in order of decreasing probability segments
+#   within each segment, the vertices are always processed in order of increasing distance
 
 def solve(client):
-    client.end()
     client.start()
     vote_array = votes(client)
 
@@ -19,23 +21,23 @@ def solve(client):
             distribution[vote] = []
         distribution[vote].append(vertex)
 
-    vertex_above_70 = []
-    vertex_above_50 = []
-    vertex_above_30 = []
-    vertex_below_30 = []
+    vertex_100_to_70 = []
+    vertex_70_to_50 = []
+    vertex_50_to_30 = []
+    vertex_30_to_0 = []
 
     # segmentation of vertices based on student votes
     for vote in sorted(distribution):
         if vote >= 0.7 * client.k:
-            vertex_above_70.extend(distribution[vote])
+            vertex_100_to_70.extend(distribution[vote])
         elif vote >= 0.5 * client.k:
-            vertex_above_50.extend(distribution[vote])
+            vertex_70_to_50.extend(distribution[vote])
         elif vote >= 0.3 * client.k:
-            vertex_above_30.extend(distribution[vote])
+            vertex_50_to_30.extend(distribution[vote])
         else:
-            vertex_below_30.extend(distribution[vote])
+            vertex_30_to_0.extend(distribution[vote])
 
-    segments = [vertex_above_70, vertex_above_50, vertex_above_30, vertex_below_30]
+    segments = [vertex_100_to_70, vertex_70_to_50, vertex_50_to_30, vertex_30_to_0]
 
     # reorder each segment based on shortest path distance from home
     shortest_path = nx.single_source_shortest_path(client.G, client.h)
@@ -54,12 +56,14 @@ def solve(client):
     # remote based on predefined ordering until we find all bots
     counter = 0
     for segment in segments:
-        if segment == vertex_above_30:
+        if segment == vertex_70_to_50:
+            print("Touched segments below 70% probability")
+        if segment == vertex_50_to_30:
             print("Touched segments below 50% probability")
-        if segment == vertex_below_30:
+        if segment == vertex_30_to_0:
             print("Touched segments below 30% probability")
         for vertex in segment:
-            counter = counter + remote_home(client, shortest_path, vertex + 1)
+            counter += remote_home(client, shortest_path, vertex + 1)
             if counter == client.l:
                 score = client.end()
                 return score
