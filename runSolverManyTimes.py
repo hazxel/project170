@@ -1,9 +1,9 @@
-from solver_CandidateMerging import *
+from solver_MergeWithinList import *
 from ModifiedClient import *
 import numpy as np
 
 
-N = 50
+N = 500
 c = Client(False)
 score = []
 

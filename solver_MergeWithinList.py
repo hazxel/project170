@@ -16,20 +16,37 @@ To test locally, please do the following:
     In both terminals, you should see a slew of scout and remote calls succeeding. At the bottom of the client terminal your score is shown. The score should be very low (since it's unlikely all bots were moved home).
 '''
 
+# threshold:0.35, punishment: 0.2, 1.5
+# ------------run # 500------------
+# The average score is: 92.0437355793851
+# The top 87% score is: 92.85971745265572
+# ----------run finished----------
 
-# average score: 90.97259925442
+# threshold:0.3, punishment: 0.2, 1.5
+# ------------run # 500------------
+# The average score is: 91.9913996811998
+# The top 87% score is: 92.76401601372372
+# ----------run finished----------
+
+# threshold:0.2, punishment: 0.1, 2
+# ------------run # 500------------
+#The average score is: 92.23356435915423
+#The top 87% score is: 92.9575455453373
+# ----------run finished----------
 
 def solve(client):
     client.end()
     client.start()
 
+    ESCAPE_THRESHOLD = 0.2
+
     # print(shortestPathfromHome(client)[1][::-1])
     vote = votes(client)
     # print('The estimated accuracy of students is '+str(estimatedAccuracy(client, vote)))
     vote = np.array(vote)
-    printVote(vote)
+    # printVote(vote)
     ac = estimatedAccuracy(client, vote)
-    print("Accuracy is: " + str(ac))
+    # print("Accuracy is: " + str(ac))
     seq = vote.argsort()
     seq = seq[::-1]
     seq = seq + 1
@@ -56,7 +73,7 @@ def solve(client):
         del Q[0]
         if len(Q) < client.l - count:
             nextAcc = calCorrectProb(client, vote, ac, seq[0])
-            if nextAcc < 0.6:
+            if nextAcc < ESCAPE_THRESHOLD:
                 break
             Q.append(seq[0])
             seq = np.delete(seq, [0])
@@ -64,8 +81,8 @@ def solve(client):
     knownBots = client.bot_count[Q[0]]
     count = count + client.remote(int(Q[0]), client.h) - knownBots
     del Q[0]
-    print("Now directly remote home:")
-    print("Count is: " + str(count))
+    # print("Now directly remote home:")
+    # print("Count is: " + str(count))
 
     costinSeq = []
     for v in Q:
@@ -75,8 +92,12 @@ def solve(client):
     seq = np.array(seq)
     for v in seq:
         punishment = 1
+        if calCorrectProb(client, vote, ac, v) < 0.3:
+            punishment = 1
         if calCorrectProb(client, vote, ac, v) < 0.2:
-            punishment = 1.5
+            punishment = 1
+        if calCorrectProb(client, vote, ac, v) < 0.1:
+            punishment = 2
         if v != client.h:
             costinSeq.append(
                 (1 - calCorrectProb(client, vote, ac, v)) * client.G.edges[v, client.h]['weight'] * punishment)
@@ -93,5 +114,5 @@ def solve(client):
     # remoteKnownBotHome(client)
 
     score = client.end()
-    print("The input was: V", client.v, " E: ", client.e, " L: ", client.l, " K: ", client.k)
+    # print("The input was: V", client.v, " E: ", client.e, " L: ", client.l, " K: ", client.k)
     return score
