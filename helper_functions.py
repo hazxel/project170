@@ -7,18 +7,36 @@ import math
 ### Be careful that this function runs client.scout() k*v times.
 # Input: -
 # Output: A list showing the number of students who believe there exists a bot on a certain vertex.
-def votes(client):
+"""
+alpha: Limit the number of students
+    If (average edge weight/number of vertices) << number of students,
+    then we risk wasting to much cost on scouting. Limit the students to be 
+    min(3~7 * (Average Edge Weight/number of vertices), number of students),
+    where the 3~7 range in the min is entirely empirical and can be changed.
+    Mathmatically, the cost to remote all vertices is k*v. The cost for the 
+    fomula above can be realized as min(3~7 * AEW/v, number of students) * v.
+    In reality, alpha=3 mostly do nothing.
+"""
+def votes(client, alpha=3):
     p = []
     vertices = list(range(1, client.v + 1))
-    students = list(range(1, client.students + 1))
+
+    # Number of students we use
+    ratio = averageEdgeWeight_numOfVertices(client)
+    if round(ratio * alpha) >= client.students:
+        students = list(range(1, client.students + 1))
+    else:
+        students = np.random.choice(np.arange(1, client.students + 1), round(ratio * alpha), replace=False).tolist()
+        print("Number of students actually used:", len(students))
+
     for i in range(client.v):
         if (vertices[i] == client.home):
             p.append(0)
         else:
-            dict = client.scout(vertices[i], students)
+            results = client.scout(vertices[i], students)
             sum = 0
             for std in students:
-                if dict[std] == True:
+                if results[std] == True:
                     sum = sum + 1
             p.append(sum)
     return p
@@ -66,6 +84,21 @@ def printGraphInfo(client):
     for (u, v, wt) in client.G.edges.data('weight'):
         print('(%d, %d, %.3f)' % (u, v, wt))
     '''
+
+### Computes the average edge weights
+def averageEdgeWeight(client):
+    average_EW = 0
+    print("    Number of edges: ", client.e)
+    for (_, _, wt) in client.G.edges.data('weight'):
+        average_EW += wt/client.e
+
+    print("    Average Edge weights: ", average_EW)
+    return average_EW
+
+### Computes the average edge weights/number of vertices ratio
+def averageEdgeWeight_numOfVertices(client):
+    print("    Number of vertices: ", client.v)
+    return averageEdgeWeight(client) / client.v
 
 
 ### Remote all the bots home when all L bots are found

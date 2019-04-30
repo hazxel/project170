@@ -1,19 +1,22 @@
-from solver_MergeWithinList import *
+from solver_CandidateMerging import *
 from ModifiedClient import *
+import numpy as np
+
 
 N = 50
-client = Client(False)
-score = 0
-client.end()
+c = Client(False)
+score = []
 
 for i in range(1, N + 1):
-    print("Starting run #", i)
-    cur = solve(client)
-    score += cur
-    print("Average score: ", score / i)
+    print("Starting run #{}".format(i))
+    s = solve(c)
+    score.append(s)
+    
+    score_all = np.mean(score)
+    score_top_87 = np.mean(np.sort(score)[::-1][:int(np.ceil(len(score) * 0.87))])
+    print('')
+    print('------------run # {}------------'.format(i))
+    print('The average score is: {}'.format(score_all))
+    print('The top 87% score is: {}'.format(score_top_87))
     print('----------run finished----------')
     print('')
-
-score /= N
-
-print('Finished running ' + str(N) + ' tests, final average score is: ' + str(score))
