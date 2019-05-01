@@ -107,9 +107,12 @@ def averageEdgeWeight_numOfVertices(client):
 # Finished but UNTESTED, correctness unknown
 def remoteKnownBotHome(client):
     knownBots = [client.h]
-    for i in range(client.v):
+    for i in range(1, client.v + 1):
+        if i == client.h:
+            continue
         if (client.bot_count[i] > 0):
             knownBots.append(i)
+    
     newG = nx.Graph()
     for i in range(len(knownBots)):
         newG.add_node(knownBots[i])
@@ -119,8 +122,8 @@ def remoteKnownBotHome(client):
 
     MST = nx.minimum_spanning_tree(newG)
     bfs_edge = list(nx.edge_bfs(MST, source=client.home))
-
-    for edge in bfs_edge:
+    r_bfs_edge = reversed(bfs_edge)
+    for edge in r_bfs_edge:
         client.remote(edge[1], edge[0])
 
 
@@ -197,3 +200,16 @@ def calCorrectProb(client, vote, accuracy, vertex):
         vote[vertex]) * (1 - accuracy) ** vote[vertex] * accuracy ** (client.k - vote[vertex])
     prob = rightProb / (rightProb + leftProb)
     return prob
+
+
+### Find the nearest neighbour of given vertex
+def nearestNeighbor(client, vertex):
+    nb = list(client.G.neighbors(vertex))
+    wt = []
+    for v in nb:
+        wt.append(client.G.edges[vertex, v]['weight'])
+    wt = np.array(wt)
+    nearest = np.argmin(wt) + 1
+    if nearest >= vertex:
+        nearest = nearest + 1
+    return nearest
