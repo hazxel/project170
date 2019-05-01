@@ -27,7 +27,7 @@ REMOTE_URL = 'http://127.0.0.1:5000/api/'
 
 
 PRINT_SCOUT_INFO = False
-PRINT_REMOTE_INFO = False
+PRINT_REMOTE_INFO = True
 
 
 ### Implements a stateful client that interacts with the server.
