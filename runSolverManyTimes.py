@@ -1,4 +1,4 @@
-from solver_MergeWithinList import *
+from solver_Combination import *
 from ModifiedClient import *
 import numpy as np
 
@@ -6,9 +6,9 @@ import numpy as np
 N = 500
 c = Client(False)
 score = []
+c.end()
 
 for i in range(1, N + 1):
-    print("Starting run #{}".format(i))
     s = solve(c)
     score.append(s)
     
