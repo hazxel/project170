@@ -22,11 +22,22 @@ To test locally, please do the following:
 #The top 87% score is: 93.49439812163993
 # ----------run finished----------
 
+# THRESHOLD = 0; 0.1, 2
+# ------------run # 326------------
+#The average score is: 92.3265663285092
+#The top 87% score is: 93.05127506802549
+# ----------run finished----------
+
+# THRESHOLD = 0.3; 0.1, 2
+# ------------run # 301------------
+#The average score is: 92.44928672141347
+#The top 87% score is: 93.15474212670722
+# ----------run finished----------
 def solve(client):
     client.end()
     client.start()
 
-    ESCAPE_THRESHOLD = 0.2
+    ESCAPE_THRESHOLD = 0.25
 
     vote = votes(client)
     # print('The estimated accuracy of students is '+str(estimatedAccuracy(client, vote)))
