@@ -16,28 +16,51 @@ To test locally, please do the following:
     In both terminals, you should see a slew of scout and remote calls succeeding. At the bottom of the client terminal your score is shown. The score should be very low (since it's unlikely all bots were moved home).
 '''
 
-# THRESHOLD = 0.2; 0.1, 2
-# ------------run # 500------------
-#The average score is: 92.76504380588408
-#The top 87% score is: 93.49439812163993
-# ----------run finished----------
-
 # THRESHOLD = 0; 0.1, 2
 # ------------run # 326------------
 #The average score is: 92.3265663285092
 #The top 87% score is: 93.05127506802549
 # ----------run finished----------
 
+# THRESHOLD = 0.15; 0.1, 2
+# ------------run # 500------------
+#The average score is: 92.57604124195353
+#The top 87% score is: 93.33864743814604
+# ----------run finished----------
+
+# THRESHOLD = 0.175; 0.1, 2
+# ------------run # 500------------
+#The average score is: 92.41500301788048
+#The top 87% score is: 93.12178448623169
+# ----------run finished----------
+
+# 0.18: 93.27
+
+# THRESHOLD = 0.19; 0.1, 2
+# ------------run # 500------------
+#The average score is: 92.66771180813755
+#The top 87% score is: 93.34234645313082
+# ----------run finished----------
+
+# THRESHOLD = 0.2; 0.1, 2
+# ------------run # 500------------
+#The average score is: 92.76504380588408
+#The top 87% score is: 93.49439812163993/93.22
+# ----------run finished----------
+
+# 0.22, 93.01
+
 # THRESHOLD = 0.3; 0.1, 2
 # ------------run # 301------------
 #The average score is: 92.44928672141347
 #The top 87% score is: 93.15474212670722
 # ----------run finished----------
+
 def solve(client):
     client.end()
     client.start()
 
-    ESCAPE_THRESHOLD = 0.25
+    ESCAPE_THRESHOLD = 0.2
 
     vote = votes(client)
     # print('The estimated accuracy of students is '+str(estimatedAccuracy(client, vote)))
@@ -99,10 +122,10 @@ def solve(client):
         if calCorrectProb(client, vote, ac, v) < 0.2:
             punishment = 1
         if calCorrectProb(client, vote, ac, v) < 0.1:
-            punishment = 2
+            punishment = 1.2
         if v != client.h:
             costinSeq.append(
-                (1 - calCorrectProb(client, vote, ac, v)) * client.G.edges[v, client.h]['weight'] * punishment)
+                (1 - calCorrectProb(client, vote, ac, v)) * punishment)
 
     costinSeq = np.array(costinSeq)
     newSeq = costinSeq.argsort()
